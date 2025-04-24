@@ -1,7 +1,7 @@
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
@@ -16,7 +16,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "API_KEY", "\"${getLocalProperty("api_key")}\"")
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -62,6 +61,11 @@ dependencies {
     implementation(libs.retrofit.gsonconverter)
     implementation(libs.squareup.logging.interceptor)
     implementation(project(":domain"))
+
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     testImplementation(libs.kotlinx.coroutines.test)
