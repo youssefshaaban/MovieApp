@@ -4,7 +4,6 @@ import com.example.data.local.MovieDao
 import com.example.data.local.model.MovieEntity
 import com.example.data.local.model.PageDataEntity
 import com.example.data.local.model.PageWithMovies
-import com.example.data.mapper.MoviePageDataMapper
 import com.example.data.model.movie_list.MovieResponse
 import com.example.data.remote.MovieAPI
 import com.example.data.util.MainCoroutineRuleTest
@@ -15,25 +14,19 @@ import com.example.domain.mapper.DataMapper
 import com.example.domain.util.BatteryChecker
 import com.example.domain.util.NetworkChecker
 import com.example.domain.util.Resource
-import io.mockk.Runs
-import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
-import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import retrofit2.Response
 
 @ExperimentalCoroutinesApi
 @RunWith(JUnit4::class)
