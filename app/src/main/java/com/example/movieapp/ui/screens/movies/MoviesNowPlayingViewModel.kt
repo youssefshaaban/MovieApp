@@ -20,7 +20,11 @@ class MoviesNowPlayingViewModel @Inject constructor(private val getNowPlayingMov
     private var page = 1
     private var canPaginate = false
     var movieListState by mutableStateOf(MovieListState.IDLE)
-    val moviesList = mutableStateListOf<Movie>()
+    val moviesList = mutableListOf<Movie>()
+    private val _searchQuery = mutableStateOf("")
+    private val _filteredMoviesList = mutableStateListOf<Movie>()
+    val filteredMoviesList: List<Movie>
+        get() = _filteredMoviesList
 
     init {
         getNowPlayingMovie()
@@ -37,13 +41,17 @@ class MoviesNowPlayingViewModel @Inject constructor(private val getNowPlayingMov
                         if (page == result.data.page) {
                             if (page == 1) {
                                 moviesList.clear()
+                                _filteredMoviesList.clear()
                                 moviesList.addAll(result.data.results)
+                                _filteredMoviesList.addAll(result.data.results)
                             } else {
                                 moviesList.addAll(result.data.results)
+                                _filteredMoviesList.addAll(result.data.results)
                             }
                             if (canPaginate) {
                                 page++
                             }
+
                         }
                         movieListState = MovieListState.IDLE
                     }
@@ -56,4 +64,24 @@ class MoviesNowPlayingViewModel @Inject constructor(private val getNowPlayingMov
             }
         }
     }
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+        if (query.isEmpty()) {
+            _filteredMoviesList.clear()
+            _filteredMoviesList.addAll(moviesList)
+        } else {
+            filterMovies()
+        }
+
+    }
+
+    // Filter movies based on the search query
+    private fun filterMovies() {
+        _filteredMoviesList.clear()
+        _filteredMoviesList.addAll(moviesList.filter { movie ->
+            movie.title.contains(_searchQuery.value, ignoreCase = true)
+        })
+    }
+
 }
