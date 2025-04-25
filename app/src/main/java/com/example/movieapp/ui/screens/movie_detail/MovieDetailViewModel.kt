@@ -29,10 +29,10 @@ class MovieDetailViewModel @Inject constructor(private val getMovieDetailUseCase
             getMovieDetailUseCase.invoke(movieId = movieId.toInt()).collectLatest {result->
                 when(result){
                     is Resource.Success->{
-                        _state.update { it.copy(movie = result.data) }
+                        _state.update { it.copy(movie = result.data, isLoading = false) }
                     }
                     is Resource.Error->{
-                        _state.update { it.copy(isError = true) }
+                        _state.update { it.copy(isError = true, isLoading = false) }
                     }
                 }
             }
