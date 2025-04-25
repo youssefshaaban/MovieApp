@@ -14,6 +14,8 @@ import com.example.domain.mapper.DataMapper
 import com.example.domain.util.BatteryChecker
 import com.example.domain.util.NetworkChecker
 import com.example.domain.util.Resource
+import io.mockk.clearAllMocks
+import io.mockk.clearMocks
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -22,6 +24,7 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,6 +47,10 @@ class MovieRepositoryImpTest {
 
     private lateinit var repository: MovieRepositoryImp
 
+    @After
+    fun tearDown() {
+       clearAllMocks()
+    }
     @Before
     fun setUp() {
         repository = MovieRepositoryImp(

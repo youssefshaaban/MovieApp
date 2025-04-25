@@ -19,7 +19,8 @@ class MoviePageDataMapper @Inject constructor() : DataMapper<PageWithMovies, Pag
                 title = it.title,
                 poster_path = it.poster_path,
                 overview = it.overview,
-                release_date = it.release_date
+                release_date = it.release_date,
+                vote_average = it.vote_average
             ) })
     }
 }

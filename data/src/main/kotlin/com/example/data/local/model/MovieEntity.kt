@@ -12,6 +12,7 @@ data class MovieEntity(
     val poster_path: String,
     val release_date: String,
     val title: String,
+    val vote_average: Double? = 0.0,
     val pageId: Int // Foreign key reference to PageDataEntity
 )
 

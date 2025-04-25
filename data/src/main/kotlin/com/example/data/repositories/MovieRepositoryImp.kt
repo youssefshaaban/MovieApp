@@ -29,10 +29,11 @@ class MovieRepositoryImp @Inject constructor(
 ) : IMoviesRepository {
     override suspend fun getMovieListNowPlaying(queryCharacters: QueryCharacters): Flow<Resource<PageData>> {
         return flow {
-            var lastCashed: PageWithMovies? = null
-            if (queryCharacters.page > 1) {
-                lastCashed = dao.getPageWithMovies(queryCharacters.page - 1)
+            val cached = dao.getPageWithMovies(queryCharacters.page)
+            cached?.let {
+                return@flow emit(Resource.Success(dataMapper.execute(cached)))
             }
+
             if (networkChecker.isConnected() && batteryChecker.isSufficient()) {
                 val response =
                     apiCall { movieAPI.getMoviesNowPlayingList(queryCharacters.toQueryMap()) }
@@ -46,20 +47,23 @@ class MovieRepositoryImp @Inject constructor(
                         )
                         dao.insertPage(pageEntity)
                         dao.insertAll(movies)
-                        val cached = dao.getPageWithMovies(queryCharacters.page)
-                        cached?.let {
-                            emit(Resource.Success(dataMapper.execute(cached)))
+                        val cacheddata = dao.getPageWithMovies(queryCharacters.page)
+                        cacheddata?.let {
+                            emit(Resource.Success(dataMapper.execute(cacheddata)))
                         }
                     }
 
                     is Resource.Error -> {
-                        lastCashed?.let { cached->
-                            emit(Resource.Success(dataMapper.execute(cached)))
+                        return@flow dao.getPageWithMovies(page = queryCharacters.page - 1)
+                            ?.let { cached ->
+                                emit(Resource.Success(dataMapper.execute(cached)))
+                            } ?: run {
+                            emit(Resource.Error(response.error))
                         }
                     }
                 }
             } else {
-                lastCashed?.let { cached ->
+                dao.getPageWithMovies(page = queryCharacters.page - 1)?.let { cached ->
                     emit(Resource.Success(dataMapper.execute(cached)))
                 }
             }
