@@ -2,13 +2,17 @@ package com.example.data.di
 
 
 import com.example.data.di.qulifier.MovieDataMapper
+import com.example.data.di.qulifier.MovieLocalDataMapper
+import com.example.data.di.qulifier.MovieRemoteDataMapper
 import com.example.data.di.qulifier.MoviesLocalDataMapper
 import com.example.data.local.MovieDao
 import com.example.data.local.model.MovieEntity
 import com.example.data.local.model.PageWithMovies
 import com.example.data.model.movie_list.MovieResponse
+import com.example.data.model.movie_list.Result
 import com.example.data.remote.MovieAPI
 import com.example.data.repositories.MovieRepositoryImp
+import com.example.domain.entity.movie.Movie
 import com.example.domain.entity.movie.PageData
 import com.example.domain.mapper.DataMapper
 import com.example.domain.repositories.IMoviesRepository
@@ -29,13 +33,23 @@ object RepositoryModule {
         movieAPI: MovieAPI,
         @MovieDataMapper dataMapper: DataMapper<PageWithMovies, PageData>,
         @MoviesLocalDataMapper dataMapperLocal: DataMapper<MovieResponse, List<MovieEntity>>,
+        @MovieLocalDataMapper movieLocalDataMapper: DataMapper<MovieEntity, Movie>,
+        @MovieRemoteDataMapper movieRemoteDataMapper: DataMapper<Result, Movie>,
         networkChecker: NetworkChecker,
         batteryChecker: BatteryChecker,
         dao: MovieDao
     ): IMoviesRepository {
-        return MovieRepositoryImp(movieAPI,networkChecker, batteryChecker,dao,dataMapperLocal,dataMapper)
+        return MovieRepositoryImp(
+            movieAPI,
+            networkChecker,
+            batteryChecker,
+            dao,
+            dataMapperLocal,
+            dataMapper,
+            movieLocalDataMapper,
+            movieRemoteDataMapper
+        )
     }
-
 
 
 }

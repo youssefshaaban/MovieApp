@@ -7,7 +7,7 @@ import com.example.domain.entity.movie.PageData
 import com.example.domain.mapper.DataMapper
 import javax.inject.Inject
 
-class MoviePageDataMapper @Inject constructor() : DataMapper<PageWithMovies, PageData> {
+class MoviesPageDataMapper @Inject constructor() : DataMapper<PageWithMovies, PageData> {
     override fun execute(data: PageWithMovies): PageData {
         return PageData(
             page =data.pageData.page,

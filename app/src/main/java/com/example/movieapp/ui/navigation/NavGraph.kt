@@ -6,7 +6,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.example.domain.entity.movie.Movie
+import com.example.movieapp.ui.screens.movie_detail.MovieDetailScreen
 import com.example.movieapp.ui.screens.movies.MovieNowPlayingScreen
 
 
@@ -24,15 +26,16 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
 }
 
 fun addMovieDetailScreen(navController: NavHostController, navGraphBuilder: NavGraphBuilder) {
-    navGraphBuilder.composable<NavRoute.MovieDetail>(typeMap = mapOf(navigationCustomArgument<Movie>()) ) { navBackStackEntry ->
-
+    navGraphBuilder.composable<NavRoute.MovieDetail> { backStackEntry ->
+        val profile: NavRoute.MovieDetail = backStackEntry.toRoute()
+        MovieDetailScreen(profile.movieId)
     }
 }
 
 fun addMovieListScreen(navController: NavHostController, navGraphBuilder: NavGraphBuilder) {
     navGraphBuilder.composable<NavRoute.MoviesList> {
         MovieNowPlayingScreen { movie ->
-            navController.navigate(NavRoute.MovieDetail(movie))
+            navController.navigate(NavRoute.MovieDetail(movie.id.toString()))
         }
     }
 

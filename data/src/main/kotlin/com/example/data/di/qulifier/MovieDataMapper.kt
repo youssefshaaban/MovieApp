@@ -10,3 +10,12 @@ annotation class MovieDataMapper
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class MoviesLocalDataMapper
+
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class MovieLocalDataMapper
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class MovieRemoteDataMapper

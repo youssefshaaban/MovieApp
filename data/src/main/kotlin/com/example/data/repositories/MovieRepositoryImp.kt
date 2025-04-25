@@ -5,9 +5,11 @@ import com.example.data.local.model.MovieEntity
 import com.example.data.local.model.PageDataEntity
 import com.example.data.local.model.PageWithMovies
 import com.example.data.model.movie_list.MovieResponse
+import com.example.data.model.movie_list.Result
 import com.example.data.remote.MovieAPI
 import com.example.data.utils.apiCall
 import com.example.domain.entity.QueryCharacters
+import com.example.domain.entity.movie.Movie
 import com.example.domain.entity.movie.PageData
 import com.example.domain.mapper.DataMapper
 import com.example.domain.repositories.IMoviesRepository
@@ -25,8 +27,11 @@ class MovieRepositoryImp @Inject constructor(
     private val batteryChecker: BatteryChecker,
     private val dao: MovieDao,
     private val dataMapperLocal: DataMapper<MovieResponse, List<MovieEntity>>,
-    private val dataMapper: DataMapper<PageWithMovies, PageData>
+    private val dataMapper: DataMapper<PageWithMovies, PageData>,
+    private val dataMapperMovieLocal: DataMapper<MovieEntity, Movie>,
+    private val dataMapperMovieRemote: DataMapper<Result, Movie>,
 ) : IMoviesRepository {
+
     override suspend fun getMovieListNowPlaying(queryCharacters: QueryCharacters): Flow<Resource<PageData>> {
         return flow {
             val cached = dao.getPageWithMovies(queryCharacters.page)
@@ -54,17 +59,31 @@ class MovieRepositoryImp @Inject constructor(
                     }
 
                     is Resource.Error -> {
-                        return@flow dao.getPageWithMovies(page = queryCharacters.page - 1)
-                            ?.let { cached ->
-                                emit(Resource.Success(dataMapper.execute(cached)))
-                            } ?: run {
-                            emit(Resource.Error(response.error))
-                        }
+                        emit(Resource.Error(response.error))
                     }
                 }
-            } else {
-                dao.getPageWithMovies(page = queryCharacters.page - 1)?.let { cached ->
-                    emit(Resource.Success(dataMapper.execute(cached)))
+            }
+        }
+    }
+
+    override suspend fun getMovieDetail(movieId: Int): Flow<Resource<Movie>> {
+        return flow {
+            val cachedMovie = dao.getMovieById(movieId)
+            cachedMovie?.let {
+                return@flow emit(Resource.Success(dataMapperMovieLocal.execute(cachedMovie)))
+            }
+
+            if (networkChecker.isConnected() && batteryChecker.isSufficient()) {
+                val response =
+                    apiCall { movieAPI.getMovieById(movieId) }
+                when (response) {
+                    is Resource.Success -> {
+                       emit(Resource.Success(dataMapperMovieRemote.execute(response.data)))
+                    }
+
+                    is Resource.Error -> {
+                        emit(Resource.Error(response.error))
+                    }
                 }
             }
         }

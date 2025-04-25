@@ -17,10 +17,11 @@ import javax.inject.Inject
 @HiltViewModel
 class MoviesNowPlayingViewModel @Inject constructor(private val getNowPlayingMoviesUseCase: GetNowPlayingMoviesUseCase) :
     ViewModel() {
-    private var page =1
-    private var canPaginate= false
+    private var page = 1
+    private var canPaginate = false
     var movieListState by mutableStateOf(MovieListState.IDLE)
     val moviesList = mutableStateListOf<Movie>()
+
     init {
         getNowPlayingMovie()
     }
@@ -48,7 +49,8 @@ class MoviesNowPlayingViewModel @Inject constructor(private val getNowPlayingMov
                     }
 
                     is Resource.Error -> {
-                        movieListState = MovieListState.ERROR
+                        movieListState = if (moviesList.isEmpty()) MovieListState.ERROR
+                        else MovieListState.IDLE
                     }
                 }
             }

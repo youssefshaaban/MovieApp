@@ -10,7 +10,7 @@ sealed class NavRoute {
     data object MoviesList: NavRoute()
 
     @Serializable
-    data class MovieDetail(val movie: Movie): NavRoute()
+    data class MovieDetail(val movieId: String): NavRoute()
 
 }
 

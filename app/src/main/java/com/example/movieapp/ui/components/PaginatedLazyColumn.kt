@@ -1,18 +1,25 @@
 package com.example.movieapp.ui.components
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.example.domain.entity.movie.Movie
+import com.example.movieapp.R
 import com.example.movieapp.ui.screens.movies.MovieListState
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -53,10 +60,14 @@ fun PaginatedLazyColumn(
     if (movieListState==MovieListState.LOADING) {
         Loading(modifier = Modifier.fillMaxSize())
     }
+    if (movieListState==MovieListState.ERROR){
+        Column (modifier=Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally , verticalArrangement = Arrangement.Center) {
+            Text(text = stringResource(R.string.something_want_wrong))
+        }
+    }
     LazyVerticalGrid(
         modifier = modifier
             .fillMaxSize(),// Add padding for better visual spacing
-
         state = lazyGridState,
         columns = GridCells.Fixed(count = 2)
     ) {
@@ -74,4 +85,5 @@ fun PaginatedLazyColumn(
         }
 
     }
+
 }

@@ -6,7 +6,7 @@ import com.example.data.model.movie_list.MovieResponse
 import com.example.domain.mapper.DataMapper
 import javax.inject.Inject
 
-class MoviePageLocalDataMapper @Inject constructor() :
+class MoviesPageLocalDataMapper @Inject constructor() :
     DataMapper<MovieResponse, List<MovieEntity>> {
     override fun execute(data: MovieResponse): List<MovieEntity> {
         return data.results.map {
@@ -20,7 +20,6 @@ class MoviePageLocalDataMapper @Inject constructor() :
                 overview = it.overview,
                 backdrop = it.backdrop_path,
                 vote_average = it.vote_average,
-
             )
         }
     }

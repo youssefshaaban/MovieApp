@@ -26,4 +26,8 @@ interface MovieDao {
     @Transaction
     @Query("SELECT * FROM pages WHERE page = :page")
     suspend fun getPageWithMovies(page: Int): PageWithMovies?
+
+    @Transaction
+    @Query("SELECT * FROM movies WHERE id = :movieId")
+    suspend fun getMovieById(movieId: Int): MovieEntity?
 }
