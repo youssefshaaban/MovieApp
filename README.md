@@ -1,6 +1,6 @@
 # MVVM Architecture Android MavelApp
 
-This repository contains a Marvel app that implements MVI architecture using Kotlin,JetpackCompose, Hilt,
+This repository contains a Movies app that implements MVVM architecture using Kotlin, JetpackCompose, Hilt,
 Retrofit, Coroutines, Flow, StateFlow, and etc.
 <p align="center">
   <img src="https://github.com/youssefshaaban/MarvelApp/blob/main/design-architecture.jpg">
@@ -8,7 +8,7 @@ Retrofit, Coroutines, Flow, StateFlow, and etc.
 <br>
 ### Major Highlights
 
-- MVI Architecture
+- MVVM Architecture
 - Jetpack Compose
 - Kotlin
 - Hilt
