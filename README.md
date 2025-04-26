@@ -1,4 +1,4 @@
-# MVVM Architecture Android MavelApp
+# MVVM Architecture Android Movies app
 
 This repository contains a Movies app that implements MVVM architecture using Kotlin, JetpackCompose, Hilt,
 Retrofit, Coroutines, Flow, StateFlow, and etc.
