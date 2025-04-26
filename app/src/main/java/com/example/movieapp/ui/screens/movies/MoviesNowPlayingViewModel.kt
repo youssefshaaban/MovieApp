@@ -11,6 +11,11 @@ import com.example.domain.entity.movie.Movie
 import com.example.domain.usecase.GetNowPlayingMoviesUseCase
 import com.example.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,17 +24,30 @@ class MoviesNowPlayingViewModel @Inject constructor(private val getNowPlayingMov
     ViewModel() {
     private var page = 1
     private var canPaginate = false
+    private val MAXPAGE = 500
     var movieListState by mutableStateOf(MovieListState.IDLE)
     val moviesList = mutableListOf<Movie>()
-    private val _searchQuery = mutableStateOf("")
+    private val _searchQueryFlow = MutableStateFlow("")
+    val searchQueryFlow: StateFlow<String> = _searchQueryFlow.asStateFlow()
     private val _filteredMoviesList = mutableStateListOf<Movie>()
     val filteredMoviesList: List<Movie>
         get() = _filteredMoviesList
 
     init {
         getNowPlayingMovie()
+        viewModelScope.launch {
+            _searchQueryFlow
+                .debounce(2000) // Wait for 3 seconds
+                .distinctUntilChanged()
+                .collect { query ->
+                    updateSearchQuery(query)
+                }
+        }
     }
 
+    fun onSearchQueryChanged(newQuery: String) {
+        _searchQueryFlow.value = newQuery
+    }
 
     fun getNowPlayingMovie() = viewModelScope.launch {
         if (page == 1 || canPaginate) {
@@ -37,7 +55,7 @@ class MoviesNowPlayingViewModel @Inject constructor(private val getNowPlayingMov
             getNowPlayingMoviesUseCase(page).collect { result ->
                 when (result) {
                     is Resource.Success -> {
-                        canPaginate = page <= 500
+                        canPaginate = page <= MAXPAGE
                         if (page == result.data.page) {
                             if (page == 1) {
                                 moviesList.clear()
@@ -66,21 +84,22 @@ class MoviesNowPlayingViewModel @Inject constructor(private val getNowPlayingMov
     }
 
     fun updateSearchQuery(query: String) {
-        _searchQuery.value = query
         if (query.isEmpty()) {
+            canPaginate = page <= MAXPAGE
             _filteredMoviesList.clear()
             _filteredMoviesList.addAll(moviesList)
         } else {
-            filterMovies()
+            canPaginate = false
+            filterMovies(query)
         }
 
     }
 
     // Filter movies based on the search query
-    private fun filterMovies() {
+    private fun filterMovies(queryString: String) {
         _filteredMoviesList.clear()
         _filteredMoviesList.addAll(moviesList.filter { movie ->
-            movie.title.contains(_searchQuery.value, ignoreCase = true)
+            movie.title.contains(queryString, ignoreCase = true)
         })
     }
 

@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.domain.entity.movie.Movie
 import com.example.movieapp.ui.BaseImageUrlGrid
@@ -43,11 +45,8 @@ fun MovieNowPlayingScreen(onClickMovie: (Movie) -> Unit) {
     val uiState = viewModel.movieListState
     val moviesList = viewModel.filteredMoviesList
     val lazyColumnListState = rememberLazyGridState()
-    var searchQuery by remember { mutableStateOf("") }
+    val searchQuery = viewModel.searchQueryFlow.collectAsStateWithLifecycle()
 
-    LaunchedEffect(searchQuery) {
-        viewModel.updateSearchQuery(searchQuery)
-    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -74,8 +73,8 @@ fun MovieNowPlayingScreen(onClickMovie: (Movie) -> Unit) {
             horizontalArrangement = Arrangement.Center
         ) {
             TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
+                value = searchQuery.value,
+                onValueChange = { viewModel.onSearchQueryChanged(it) },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Search Movies") },
                 leadingIcon = {
@@ -108,7 +107,8 @@ fun MovieNowPlayingScreen(onClickMovie: (Movie) -> Unit) {
 fun MovieItem(movie: Movie, onClick: (Movie) -> Unit) {
     Column(
         modifier = Modifier
-            .background(Color.White).padding(10.dp)
+            .background(Color.White)
+            .padding(10.dp)
             .fillMaxWidth()
             .clickable { onClick(movie) }
     ) {
@@ -121,19 +121,18 @@ fun MovieItem(movie: Movie, onClick: (Movie) -> Unit) {
             contentScale = ContentScale.Crop
         )
 
-            Text(
-                text = movie.title,
-                color = Color.Black,
-                style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Bold),
-            )
-            Text(
-                text = movie.release_date,
-                color = Color.Black,
-                style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Bold),
-            )
+        Text(
+            text = movie.title,
+            color = Color.Black,
+            style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Bold),
+        )
+        Text(
+            text = movie.release_date,
+            color = Color.Black,
+            style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Bold),
+        )
 
-        }
-
+    }
 
 
 }
